@@ -68,6 +68,12 @@ export class HeroService {
   });
 
 
+  private readonly SIMULATED_DELAY_MS = 500;
+
+  private delay(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, this.SIMULATED_DELAY_MS));
+  }
+
   getById(id: number): Hero | undefined {
     return this._heroes().find((h) => h.id === id);
   }
@@ -76,7 +82,8 @@ export class HeroService {
     this._searchTerm.set(term);
   }
 
-  add(hero: Omit<Hero, 'id' | 'createdAt'>): Hero {
+  async add(hero: Omit<Hero, 'id' | 'createdAt'>): Promise<Hero> {
+    await this.delay();
     const newHero: Hero = {
       ...hero,
       id: this._nextId++,
@@ -86,7 +93,8 @@ export class HeroService {
     return newHero;
   }
 
-  update(id: number, changes: Partial<Omit<Hero, 'id' | 'createdAt'>>): Hero | null {
+  async update(id: number, changes: Partial<Omit<Hero, 'id' | 'createdAt'>>): Promise<Hero | null> {
+    await this.delay();
     let updated: Hero | null = null;
     this._heroes.update((heroes) =>
       heroes.map((h) => {
@@ -100,7 +108,8 @@ export class HeroService {
     return updated;
   }
 
-  delete(id: number): void {
+  async delete(id: number): Promise<void> {
+    await this.delay();
     this._heroes.update((heroes) => heroes.filter((h) => h.id !== id));
   }
 }
