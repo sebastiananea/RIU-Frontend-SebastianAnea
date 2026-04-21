@@ -82,6 +82,16 @@
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "src/main.ts",
+              "src/app/app.ts",
+              "src/app/core/models/**",
+              "src/app/core/services/loading.service.ts",
+              "src/app/core/directives/**",
+              "src/app/shared/**",
+              "src/app/heroes/hero-form/**"
             ]
           }
         }
