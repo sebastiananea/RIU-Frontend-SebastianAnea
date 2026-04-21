@@ -1,0 +1,41 @@
+.hero-list {
+  margin: 24px;
+}
+
+.content {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: -1.25em;
+}
+
+.hero-table {
+  width: 100%;
+}
+
+.spinner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 10;
+}
+
+.no-data {
+  text-align: center;
+  padding: 32px;
+  color: rgba(0, 0, 0, 0.54);
+}

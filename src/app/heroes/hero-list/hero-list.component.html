@@ -1,0 +1,77 @@
+<div class="hero-list">
+  <div class="header">
+    <h1>Lista de Héroes</h1>
+  </div>
+
+  <div class="content">
+
+    <div class="toolbar">
+
+      <button mat-flat-button color="primary" (click)="onAdd()">
+        <mat-icon>add</mat-icon>
+        Agregar héroe
+      </button>
+
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar héroe</mat-label>
+        <input matInput (input)="onSearch($event)" placeholder="Ej: Spiderman, Marvel, etc." />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-paginator [length]="totalHeroes()" [pageSize]="pageSize()" [pageIndex]="pageIndex()"
+        [pageSizeOptions]="[5, 10, 20]" (page)="onPageChange($event)" aria-label="Seleccionar página" />
+
+    </div>
+
+    @if (isLoading()) {
+    <div class="spinner-overlay">
+      <mat-spinner diameter="48" />
+    </div>
+    }
+
+    <table mat-table [dataSource]="paginatedHeroes()" class="hero-table">
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let hero">{{ hero.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="alias">
+        <th mat-header-cell *matHeaderCellDef>Alias</th>
+        <td mat-cell *matCellDef="let hero">{{ hero.alias }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="universe">
+        <th mat-header-cell *matHeaderCellDef>Universo</th>
+        <td mat-cell *matCellDef="let hero">{{ hero.universe }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="powers">
+        <th mat-header-cell *matHeaderCellDef>Poderes</th>
+        <td mat-cell *matCellDef="let hero">{{ hero.powers.join(', ') }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let hero">
+          <button mat-icon-button color="primary" (click)="onEdit(hero.id)" aria-label="Editar héroe">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="onDelete(hero.id, hero.name)" aria-label="Eliminar héroe">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    </table>
+
+    @if (totalHeroes() === 0) {
+    <p class="no-data">No se encontraron héroes.</p>
+    }
+
+
+  </div>
+</div>
