@@ -1,5 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { Observable, defer, delay, map, of, tap } from 'rxjs';
 import { Hero } from '../models/hero.model';
+
+const SIMULATED_DELAY_MS = 500;
 
 //Mock data for initial heroes.
 const INITIAL_HEROES: Hero[] = [
@@ -43,6 +46,15 @@ const INITIAL_HEROES: Hero[] = [
     universe: 'Marvel',
     createdAt: new Date('2000-01-05'),
   },
+
+  {
+    id: 6,
+    name: 'AQUAMAN',
+    alias: 'Arthur Curry',
+    powers: ['Underwater breathing', 'Super strength', 'Telepathy with sea creatures'],
+    universe: 'DC',
+    createdAt: new Date('2000-01-06'),
+  },
 ];
 
 @Injectable({ providedIn: 'root' })
@@ -68,12 +80,6 @@ export class HeroService {
   });
 
 
-  private readonly SIMULATED_DELAY_MS = 500;
-
-  private delay(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, this.SIMULATED_DELAY_MS));
-  }
-
   getById(id: number): Hero | undefined {
     return this._heroes().find((h) => h.id === id);
   }
@@ -82,34 +88,40 @@ export class HeroService {
     this._searchTerm.set(term);
   }
 
-  async add(hero: Omit<Hero, 'id' | 'createdAt'>): Promise<Hero> {
-    await this.delay();
-    const newHero: Hero = {
-      ...hero,
-      id: this._nextId++,
-      createdAt: new Date(),
-    };
-    this._heroes.update((heroes) => [...heroes, newHero]);
-    return newHero;
+  // defer() garantiza que el id se genere en el momento de la suscripción, no de la creación
+  add(hero: Omit<Hero, 'id' | 'createdAt'>): Observable<Hero> {
+    return defer(() => {
+      const newHero: Hero = { ...hero, id: this._nextId++, createdAt: new Date() };
+      return of(newHero).pipe(
+        delay(SIMULATED_DELAY_MS),
+        tap(() => this._heroes.update((heroes) => [...heroes, newHero])),
+      );
+    });
   }
 
-  async update(id: number, changes: Partial<Omit<Hero, 'id' | 'createdAt'>>): Promise<Hero | null> {
-    await this.delay();
-    let updated: Hero | null = null;
-    this._heroes.update((heroes) =>
-      heroes.map((h) => {
-        if (h.id === id) {
-          updated = { ...h, ...changes };
-          return updated;
-        }
-        return h;
+  update(id: number, changes: Partial<Omit<Hero, 'id' | 'createdAt'>>): Observable<Hero | null> {
+    return of(null).pipe(
+      delay(SIMULATED_DELAY_MS),
+      map(() => {
+        let updated: Hero | null = null;
+        this._heroes.update((heroes) =>
+          heroes.map((h) => {
+            if (h.id === id) {
+              updated = { ...h, ...changes };
+              return updated;
+            }
+            return h;
+          }),
+        );
+        return updated;
       }),
     );
-    return updated;
   }
 
-  async delete(id: number): Promise<void> {
-    await this.delay();
-    this._heroes.update((heroes) => heroes.filter((h) => h.id !== id));
+  delete(id: number): Observable<void> {
+    return of(void 0).pipe(
+      delay(SIMULATED_DELAY_MS),
+      tap(() => this._heroes.update((heroes) => heroes.filter((h) => h.id !== id))),
+    );
   }
 }
