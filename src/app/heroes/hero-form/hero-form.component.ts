@@ -44,15 +44,13 @@ export class HeroFormComponent {
 
   protected readonly isEditMode = computed(() => this.id() !== null);
 
-  protected readonly form = this.fb.group({
+  protected readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     alias: ['', Validators.required],
-    // Los poderes se ingresan separados por coma y se transforman a array al guardar
     powers: ['', Validators.required],
     universe: ['', Validators.required],
   });
 
-  // Bridgeamos el estado del formulario (Observable) a una signal para usarla en el template
   protected readonly isFormValid = toSignal(
     this.form.statusChanges.pipe(
       map((status) => status === 'VALID'),
@@ -61,8 +59,7 @@ export class HeroFormComponent {
   );
 
   constructor() {
-    // effect() reacciona cuando heroId cambia (ej: navegación directa a /heroes/edit/:id)
-    // y precarga los datos del héroe en el formulario
+
     effect(() => {
       const id = this.id();
       if (id === null) return;
@@ -84,13 +81,13 @@ export class HeroFormComponent {
 
     const { name, alias, powers, universe } = this.form.getRawValue();
     const heroData = {
-      name: name!,
-      alias: alias!,
-      powers: powers!
+      name,
+      alias,
+      powers: powers
         .split(',')
         .map((p) => p.trim())
         .filter(Boolean),
-      universe: universe!,
+      universe,
     };
 
     const id = this.id();
