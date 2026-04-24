@@ -90,7 +90,7 @@ export class HeroListComponent implements OnInit {
       .afterClosed()
       .pipe(
         filter((confirmed) => !!confirmed),
-        switchMap(() => this.loadingService.withLoading(this.heroService.delete(id))),
+        switchMap(() => this.heroService.delete(id)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();

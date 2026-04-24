@@ -35,7 +35,7 @@ export class HeroFormComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  // withComponentInputBinding() permite recibir el parámetro de ruta `:id` como signal
+
   readonly id = input<number | null, string | undefined>(null, {
     transform: (value: string | undefined) => (value ? Number(value) : null),
   });
@@ -95,8 +95,7 @@ export class HeroFormComponent {
       ? this.heroService.update(id, heroData)
       : this.heroService.add(heroData);
 
-    this.loadingService
-      .withLoading(operation$)
+    operation$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.router.navigate(['/heroes']));
   }
