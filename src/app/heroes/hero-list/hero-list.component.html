@@ -14,7 +14,7 @@
 
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar héroe</mat-label>
-        <input matInput (input)="onSearch($event)" placeholder="Ej: Spiderman, Marvel, etc." />
+        <input matInput [formControl]="searchControl" placeholder="Ej: Spiderman, Marvel, etc." />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
 

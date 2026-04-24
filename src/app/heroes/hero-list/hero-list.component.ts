@@ -1,7 +1,8 @@
-import { Component, DestroyRef, inject, computed, signal } from '@angular/core';
+import { Component, DestroyRef, inject, computed, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { filter, switchMap } from 'rxjs';
+import { filter, switchMap, debounceTime, distinctUntilChanged } from 'rxjs';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,6 +19,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 @Component({
   selector: 'app-hero-list',
   imports: [
+    ReactiveFormsModule,
     MatTableModule,
     MatPaginatorModule,
     MatButtonModule,
@@ -30,13 +32,14 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
   templateUrl: './hero-list.component.html',
   styleUrl: './hero-list.component.scss',
 })
-export class HeroListComponent {
+export class HeroListComponent implements OnInit {
   private readonly heroService = inject(HeroService);
   private readonly loadingService = inject(LoadingService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
 
+  protected readonly searchControl = new FormControl('');
 
   protected readonly isLoading = this.loadingService.isLoading;
   protected readonly pageIndex = signal(0);
@@ -50,9 +53,17 @@ export class HeroListComponent {
     return this.heroService.filteredHeroes().slice(start, start + this.pageSize());
   });
 
-  onSearch(event: Event): void {
-    this.heroService.search((event.target as HTMLInputElement).value);
-    this.pageIndex.set(0);
+  ngOnInit(): void {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((searchTerm) => {
+        this.heroService.search(searchTerm || '');
+        this.pageIndex.set(0);
+      });
   }
 
   onPageChange(event: PageEvent): void {
