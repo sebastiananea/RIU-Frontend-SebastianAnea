@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, inject } from '@angular/core';
+import { Directive, ElementRef, HostListener, HostBinding, inject } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
@@ -8,11 +8,11 @@ export class UpperCaseInputDirective {
   private readonly control = inject(NgControl, { self: true });
   private readonly el = inject<ElementRef<HTMLInputElement>>(ElementRef);
 
-  @HostListener('input')
-  onInput(): void {
+  @HostBinding('style.text-transform') textTransform = 'uppercase';
+
+  @HostListener('blur')
+  onBlur(): void {
     const upper = this.el.nativeElement.value.toUpperCase();
-    this.control.control?.setValue(upper, { emitEvent: false });
+    this.control.control?.setValue(upper);
   }
-
-
 }
